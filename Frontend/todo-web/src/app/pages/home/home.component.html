@@ -1,0 +1,151 @@
+<div class="min-h-screen bg-slate-100 px-4 py-8">
+  <div class="mx-auto w-full max-w-lg">
+    <div class="rounded-2xl bg-white p-8 shadow-lg">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900">My todos</h1>
+          @if (email()) {
+            <p class="mt-1 text-sm text-slate-600">{{ email() }}</p>
+          }
+        </div>
+        <button
+          type="button"
+          class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          (click)="logout()"
+        >
+          Logout
+        </button>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {{ errorMessage() }}
+        </p>
+      }
+
+      <form class="mt-6 space-y-3" (ngSubmit)="addTodo()">
+        <input
+          type="text"
+          [(ngModel)]="newTitle"
+          name="newTitle"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="Title"
+          [disabled]="isSaving()"
+        />
+        <textarea
+          [(ngModel)]="newDescription"
+          name="newDescription"
+          rows="2"
+          class="w-full resize-none rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          placeholder="Description (optional)"
+          [disabled]="isSaving()"
+        ></textarea>
+        <button
+          type="submit"
+          class="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isSaving() || !newTitle.trim()"
+        >
+          Add task
+        </button>
+      </form>
+
+      <div class="mt-6">
+        @if (isLoading()) {
+          <p class="text-sm text-slate-500">Loading todos...</p>
+        } @else if (todos().length === 0) {
+          <p class="rounded-lg bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+            No todo task yet. Add one above.
+          </p>
+        } @else {
+          <ul class="divide-y divide-slate-100">
+            @for (todo of todos(); track todo.id) {
+              <li class="py-4">
+                @if (editingId() === todo.id) {
+                  <div class="space-y-3">
+                    <input
+                      type="text"
+                      [(ngModel)]="editTitle"
+                      name="editTitle-{{ todo.id }}"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      placeholder="Title"
+                      [disabled]="isSaving()"
+                    />
+                    <textarea
+                      [(ngModel)]="editDescription"
+                      name="editDescription-{{ todo.id }}"
+                      rows="2"
+                      class="w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      placeholder="Description"
+                      [disabled]="isSaving()"
+                    ></textarea>
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                        [disabled]="isSaving() || !editTitle.trim()"
+                        (click)="saveEdit(todo)"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        [disabled]="isSaving()"
+                        (click)="cancelEdit()"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      [checked]="todo.isCompleted"
+                      (change)="toggleTodo(todo)"
+                    />
+                    <div class="min-w-0 flex-1">
+                      <p
+                        class="text-sm font-medium text-slate-800"
+                        [class.line-through]="todo.isCompleted"
+                        [class.text-slate-400]="todo.isCompleted"
+                      >
+                        {{ todo.title }}
+                      </p>
+                      @if (todo.description) {
+                        <p
+                          class="mt-1 text-sm text-slate-500"
+                          [class.line-through]="todo.isCompleted"
+                          [class.text-slate-400]="todo.isCompleted"
+                        >
+                          {{ todo.description }}
+                        </p>
+                      }
+                    </div>
+                    <div class="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        class="cursor-pointer text-sm text-blue-600 hover:text-blue-700"
+                        (click)="startEdit(todo)"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        class="cursor-pointer text-sm text-red-600 hover:text-red-700"
+                        (click)="deleteTodo(todo)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</div>
