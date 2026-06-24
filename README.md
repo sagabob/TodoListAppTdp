@@ -43,7 +43,7 @@ ASP.NET Core Web API (.NET 10) that exposes todo CRUD and auth endpoints. Uses E
 **Explanation on technical decisions**
 
 - Auth is intentionally simple (demo email/password from config), but follows a real SPA pattern: JWT for authenticated calls, stored in an httpOnly cookie with Secure/SameSite settings appropriate for development and production.
-- MediatR with CQRS separates reads and writes into focused handlers, keeping controllers thin and making the API easier to extend (e.g. toward vertical slices per feature).
+- MediatR with CQRS separates reads and writes into focused handlers, keeping controllers thin and making the API easier to extend (e.g. toward vertical slices per feature). The pipeline style also allows us to inject other behaviors such as validation or logging.
 - The Result pattern handles expected business failures (such as not found) without exceptions; controllers map these to HTTP status codes. Unexpected errors are handled globally via ASP.NET Core exception handling and ProblemDetails for a consistent error format.
 
 ### Frontend — `Frontend/todo-web`
